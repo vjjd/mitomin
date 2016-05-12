@@ -4,19 +4,20 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import jQuery from 'jquery';
 import Dropzone from 'react-dropzone';
+import request from'superagent';
 
-var request = require('superagent');
+let clientFiles = [];
 
 class Step1Dropzone extends React.Component {
     onDrop(files) {
-        console.log('Received files: ', files);
+        let req = request.post('/api/v1/files');
 
-        var req = request.post('/api/v1/files');
         files.forEach((file)=> {
             req.attach(file.name, file);
         });
+
         req.end((err, res) => {
-            console.log(res);
+            clientFiles = clientFiles.concat(JSON.parse(res.text).files);
         });
     }
 
@@ -34,11 +35,11 @@ class Step1Dropzone extends React.Component {
 class Step2List extends React.Component {
     constructor() {
         super();
-        this.state = { files: [] }
+        this.state = { files: clientFiles }
     }
 
     componentWillMount() {
-        //setInterval(() => this._fetchFiles(), 5000);
+        setInterval(() => this._fetchFiles(), 5000);
     }
 
     render() {
@@ -52,24 +53,31 @@ class Step2List extends React.Component {
     }
 
     _fetchFiles() {
-        jQuery.ajax({
-            method: 'GET',
-            url: '/api/v1/files',
-            success: files => {
-                this.setState({ files });
+        clientFiles.forEach((file, i) => {
+            if (file.status == 'pending') {
+                jQuery.ajax({
+                    method: 'GET',
+                    url: `/api/v1/files/${file.key}`,
+                    success: response => {
+                        clientFiles[i].status = response.status;
+                        console.log(response);
+                    }
+                })
             }
-        })
+        });
+
+        this.setState({ files: clientFiles });
     }
 }
 
 jQuery(() => {
     ReactDOM.render(
-        <Step2List />,
-        document.getElementById('files')
-    );
-    
-    ReactDOM.render(
         <Step1Dropzone />,
         document.getElementById('dropzone')
+    );
+
+    ReactDOM.render(
+        <Step2List />,
+        document.getElementById('files')
     );
 });

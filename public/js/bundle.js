@@ -31215,6 +31215,10 @@ var _reactDropzone = require('react-dropzone');
 
 var _reactDropzone2 = _interopRequireDefault(_reactDropzone);
 
+var _superagent = require('superagent');
+
+var _superagent2 = _interopRequireDefault(_superagent);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -31223,7 +31227,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var request = require('superagent');
+var clientFiles = [];
 
 var Step1Dropzone = function (_React$Component) {
     _inherits(Step1Dropzone, _React$Component);
@@ -31237,14 +31241,14 @@ var Step1Dropzone = function (_React$Component) {
     _createClass(Step1Dropzone, [{
         key: 'onDrop',
         value: function onDrop(files) {
-            console.log('Received files: ', files);
+            var req = _superagent2.default.post('/api/v1/files');
 
-            var req = request.post('/api/v1/files');
             files.forEach(function (file) {
                 req.attach(file.name, file);
             });
+
             req.end(function (err, res) {
-                console.log(res);
+                clientFiles = clientFiles.concat(JSON.parse(res.text).files);
             });
         }
     }, {
@@ -31277,14 +31281,18 @@ var Step2List = function (_React$Component2) {
 
         var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Step2List).call(this));
 
-        _this2.state = { files: [] };
+        _this2.state = { files: clientFiles };
         return _this2;
     }
 
     _createClass(Step2List, [{
         key: 'componentWillMount',
         value: function componentWillMount() {
-            //setInterval(() => this._fetchFiles(), 5000);
+            var _this3 = this;
+
+            setInterval(function () {
+                return _this3._fetchFiles();
+            }, 5000);
         }
     }, {
         key: 'render',
@@ -31306,15 +31314,20 @@ var Step2List = function (_React$Component2) {
     }, {
         key: '_fetchFiles',
         value: function _fetchFiles() {
-            var _this3 = this;
-
-            _jquery2.default.ajax({
-                method: 'GET',
-                url: '/api/v1/files',
-                success: function success(files) {
-                    _this3.setState({ files: files });
+            clientFiles.forEach(function (file, i) {
+                if (file.status == 'pending') {
+                    _jquery2.default.ajax({
+                        method: 'GET',
+                        url: '/api/v1/files/' + file.key,
+                        success: function success(response) {
+                            clientFiles[i].status = response.status;
+                            console.log(response);
+                        }
+                    });
                 }
             });
+
+            this.setState({ files: clientFiles });
         }
     }]);
 
@@ -31322,9 +31335,9 @@ var Step2List = function (_React$Component2) {
 }(_react2.default.Component);
 
 (0, _jquery2.default)(function () {
-    _reactDom2.default.render(_react2.default.createElement(Step2List, null), document.getElementById('files'));
-
     _reactDom2.default.render(_react2.default.createElement(Step1Dropzone, null), document.getElementById('dropzone'));
+
+    _reactDom2.default.render(_react2.default.createElement(Step2List, null), document.getElementById('files'));
 });
 
 },{"jquery":28,"react":170,"react-dom":30,"react-dropzone":31,"superagent":172}]},{},[176]);
