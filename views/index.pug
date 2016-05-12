@@ -1,0 +1,37 @@
+doctype html
+html
+    head
+        title mitohg
+        script(src='/js/bundle.js')
+        style
+            include /css/kube.min.css
+        style
+            include /css/font-awesome.min.css
+    body
+        row
+            column(cols='1')
+            column(cols='10')
+                h1(class='title') mitohg
+                p.
+                    Данный сервис позволяет провести всесторонний анализ митохондриальной ДНК человека.<br/>
+                    К основным возможностям программы относятся:<br/>
+                ul
+                    li Для fasta-файлов: определение гаплогруппы по номенклатуре PhyloTree build 17;
+                    li Для sam-файлов: Определение уровня гетероплазмии для каждой нуклеотидной позиции мтДНК по результатам NGS
+                    li Для FASTQ-файлов выравнивание коротких прочтений производится при помощи BWA относительно последовательности RSRS
+                    li Обработка файлов может занимать продолжительное время.
+        row
+            column(cols='1')
+            column(cols='3')
+                h4 Загрузите подходящие FASTA, FASTQ или SAM файлы:
+                #dropzone
+            column(cols='2')
+                h4 Ваши файлы:
+                    span(style="color:white") #
+                    a(href="/clear")
+                        i(class="fa fa-trash")
+                #files
+            column(cols='5')
+                h4 Результат:
+                #label
+                img#preview(src='/img/blank.png')
