@@ -13,7 +13,7 @@ module.exports = (key, callback) => {
             file.status = 'done';
 
             redis.set(key, JSON.stringify(file), err => {
-                callback();
+                callback(path);
             });
         });
     });

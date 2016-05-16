@@ -1,29 +1,39 @@
 'use strict';
 
-let async = require('async');
-let redis = require('./redis');
-let   sam = require('./sam');
-let fastq = require('./fastq');
+let heteroplasmy = require('./heteroplasmy');
+let redisStatus  = require('./redis-status-file');
+let async        = require('async');
+let redis        = require('./redis');
+let   sam        = require('./sam');
+let fastq        = require('./fastq');
+let rplot        = require('./rplot');
 
-let queue = async.queue((file, callback) => {
-    let extension = file.name.toLowerCase().match(/\.(sam|fastq|fq|fasta|fa)$/);
+let queue = async.queue((task, callback) => {
+    let extension = task.name.toLowerCase().match(/\.(sam|fastq|fq|fasta|fa)$/);
     if (extension) extension = extension[1];
 
     switch (extension) {
         case 'sam':
-            sam(file.key, callback);
+            heteroplasmy(task)
+                .then(rplot)
+                .then(redisStatus)
+                .then(callback);
             break;
 
         case 'fastq':
-            fastq(file.key, callback);
+            fastq(task)
+                .then(heteroplasmy)
+                .then(rplot)
+                .then(redisStatus)
+                .then(callback);
             break;
 
         default:
-            redis.get(file.key, (err, file) => {
-                file = JSON.parse(file);
-                file.status = 'unsupported file';
+            redis.get(task.key, (err, task) => {
+                task = JSON.parse(task);
+                task.status = 'unsupported task';
 
-                redis.set(file.key, JSON.stringify(file), err => callback());
+                redis.set(task.key, JSON.stringify(task), err => callback());
             });
             break;
     }

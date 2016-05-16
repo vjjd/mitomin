@@ -7,11 +7,6 @@ import Dropzone from 'react-dropzone';
 import request from'superagent';
 
 let clientFiles = [];
-let statusIcons = {
-    'done': 'fa fa-check',
-    'pending': 'fa fa-hourglass',
-    'unsupported file': 'fa fa-ban'
-};
 
 class Step1Dropzone extends React.Component {
     onDrop(files) {
@@ -29,14 +24,9 @@ class Step1Dropzone extends React.Component {
     render() {
         return (
             <div>
-                <center>
-                    <Dropzone onDrop={this.onDrop}>
-                        <div>
-                            <br/>
-                            Перетащите ваши файлы сюда или кликните по этой области мышкой, чтобы загрузить файлы на сервер.
-                        </div>
-                    </Dropzone>
-                </center>
+                <Dropzone onDrop={this.onDrop}>
+                    <div>Try dropping some files here, or click to select files to upload.</div>
+                </Dropzone>
             </div>
         );
     }
@@ -54,16 +44,11 @@ class Step2List extends React.Component {
 
     render() {
         return (
-            <table class="table-responsive">
-                <tbody>
+            <ul>
                 {this.state.files.map((f, i) => (
-                    <tr key={i}>
-                        <td>{f.name}</td>
-                        <td><i className={statusIcons[f.status]} /></td>
-                    </tr>
+                    <li key={i}>{f.name} {f.status}</li>
                 ))}
-                </tbody>
-            </table>
+            </ul>
         );
     }
 
@@ -75,6 +60,7 @@ class Step2List extends React.Component {
                     url: `/api/v1/files/${file.key}`,
                     success: response => {
                         clientFiles[i].status = response.status;
+                        console.log(response);
                     }
                 })
             }

@@ -22,18 +22,16 @@ html
                     li Обработка файлов может занимать продолжительное время.
         row
             column(cols='1')
-            column(cols='10')
+            column(cols='3')
                 h4 Загрузите подходящие FASTA, FASTQ или SAM файлы:
                 #dropzone
-        row
-            column(cols='1')
-            column(cols='4')
+            column(cols='2')
                 h4 Ваши файлы:
                     span(style="color:white") #
                     a(href="/clear")
                         i(class="fa fa-trash")
                 #files
-            column(cols='6')
+            column(cols='5')
                 h4 Результат:
                 #label
                 img#preview(src='/img/blank.png')
