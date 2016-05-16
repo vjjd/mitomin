@@ -31228,6 +31228,11 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var clientFiles = [];
+var statusIcons = {
+    'done': 'fa fa-check',
+    'pending': 'fa fa-hourglass',
+    'unsupported file': 'fa fa-ban'
+};
 
 var Step1Dropzone = function (_React$Component) {
     _inherits(Step1Dropzone, _React$Component);
@@ -31258,12 +31263,17 @@ var Step1Dropzone = function (_React$Component) {
                 'div',
                 null,
                 _react2.default.createElement(
-                    _reactDropzone2.default,
-                    { onDrop: this.onDrop },
+                    'center',
+                    null,
                     _react2.default.createElement(
-                        'div',
-                        null,
-                        'Try dropping some files here, or click to select files to upload.'
+                        _reactDropzone2.default,
+                        { onDrop: this.onDrop },
+                        _react2.default.createElement(
+                            'div',
+                            null,
+                            _react2.default.createElement('br', null),
+                            'Перетащите ваши файлы сюда или кликните по этой области мышкой, чтобы загрузить файлы на сервер.'
+                        )
                     )
                 )
             );
@@ -31298,17 +31308,28 @@ var Step2List = function (_React$Component2) {
         key: 'render',
         value: function render() {
             return _react2.default.createElement(
-                'ul',
-                null,
-                this.state.files.map(function (f, i) {
-                    return _react2.default.createElement(
-                        'li',
-                        { key: i },
-                        f.name,
-                        ' ',
-                        f.status
-                    );
-                })
+                'table',
+                { 'class': 'table-responsive' },
+                _react2.default.createElement(
+                    'tbody',
+                    null,
+                    this.state.files.map(function (f, i) {
+                        return _react2.default.createElement(
+                            'tr',
+                            { key: i },
+                            _react2.default.createElement(
+                                'td',
+                                null,
+                                f.name
+                            ),
+                            _react2.default.createElement(
+                                'td',
+                                null,
+                                _react2.default.createElement('i', { className: statusIcons[f.status] })
+                            )
+                        );
+                    })
+                )
             );
         }
     }, {
@@ -31321,7 +31342,6 @@ var Step2List = function (_React$Component2) {
                         url: '/api/v1/files/' + file.key,
                         success: function success(response) {
                             clientFiles[i].status = response.status;
-                            console.log(response);
                         }
                     });
                 }

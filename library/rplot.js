@@ -1,5 +1,5 @@
 let config = require('../config');
-let spawn = require('child_process').spawn;
+let spawn  = require('child_process').spawn;
 
 module.exports = (task) => {
     return new Promise((resolve) => {

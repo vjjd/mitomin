@@ -1,8 +1,8 @@
 'use strict';
 
 let heteroplasmy = require('./heteroplasmy');
-let redis = require('./redis');
-let config = require('../config');
+let config       = require('../config');
+let redis        = require('./redis');
 
 module.exports = (key, callback) => {
     const path = `${config.uploads}/${key}`;

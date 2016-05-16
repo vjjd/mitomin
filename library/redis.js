@@ -1,6 +1,6 @@
 'use strict';
 
-let redis = require('redis');
+let redis  = require('redis');
 let config = require('./../config');
 
 let client = redis.createClient(config.redis.port, config.redis.host);
