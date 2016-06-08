@@ -1,0 +1,6 @@
+#gmap {
+    position: relative;
+    height: 200px;
+    width: 350px;
+    border: 1px solid gray;
+}

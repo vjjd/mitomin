@@ -7,6 +7,13 @@ html
             include /css/kube.min.css
         style
             include /css/font-awesome.min.css
+        //script(src='https://maps.googleapis.com/maps/api/js?v=3.exp')
+        //script.
+        //    var map;
+        //    function initialize() {map = new google.maps.Map(document.getElementById('gmap'), {zoom: 8, center: {lat: -34.397, lng: 150.644}})}
+        //    google.maps.event.addDomListener(window, 'load', initialize);
+        //style
+        //    include /css/index.css
     body
         row
             column(cols='1')
@@ -25,6 +32,9 @@ html
             column(cols='10')
                 h4 Загрузите подходящие FASTA, FASTQ или SAM файлы:
                 #dropzone
+            //column(cols='4')
+            //    h4 Я карта!
+            //    div#gmap
         row
             column(cols='1')
             column(cols='4')
@@ -32,7 +42,7 @@ html
                     span(style="color:white") #
                     a(href="/clear")
                         i(class="fa fa-trash")
-                #files
+                #tasks
             column(cols='6')
                 h4 Результат:
                 #label

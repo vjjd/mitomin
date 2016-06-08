@@ -4,17 +4,17 @@ let fs = require('fs');
 let split = require('split');
 let config = require('../config');
 
-module.exports = (task) => {
-    return new Promise((resolve) => {
-        const path = `${config.uploads}/${task.key}`;
-
+module.exports = (task, callback) => {
+        let input = `${config.uploads}/${task.id}`;
+        let output = `${config.resultsFolder}/${task.hash}/${task.bodyName}.csv`;
+    
         let heteroplasmy = [];
         for (let i = 1; i < 17000; i++) {
-            heteroplasmy.push({ A: 0, C: 0, G: 0, T: 0, N: 0 });
+            heteroplasmy.push({A: 0, C: 0, G: 0, T: 0, N: 0});
         }
 
         let stream = fs
-            .createReadStream(path, 'utf8')
+            .createReadStream(input, 'utf8')
             .pipe(split());
 
         stream.on('data', line => {
@@ -30,15 +30,14 @@ module.exports = (task) => {
 
         stream.on('end', () => {
             fs.writeFile(
-                `${path}.csv`,
+                output,
                 'SNP; heteroplasmy\n' +
                 heteroplasmy
                     .map((p, i) => (p.A + p.C + p.G + p.T) ? `${i}; ${Math.max(p.A, p.C, p.G, p.T)/(p.A + p.C + p.G + p.T)}` : '')
                     .filter(s => s !== '')
                     .join('\n'),
                 'utf8',
-                resolve(task)
+                callback
             );
         });
-    });
 };

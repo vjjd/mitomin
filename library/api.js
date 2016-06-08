@@ -1,39 +1,48 @@
 'use strict';
 
 let  multer = require('multer');
+let  worker = require('./worker');
 let express = require('express');
-let   queue = require('./queue');
-let   redis = require('./redis');
+let consts  = require('./constants');
 
 let router = express.Router();
 let upload = multer({ dest: 'uploads' });
 
-// POST /files
-router.post('/files', upload.any(), (req, res) => {
-    let files = req.files.map(file => {
+router.post('/tasks', upload.any(), (req, res) => {
+    let tasks = req.files.map(file => {
         return {
-            name: file.originalname,
-            key: file.filename,
-            status: 'pending'
+            label: file.originalname,
+            id: file.filename,
+            bodyName: file.originalname.replace(/\.?\w+$/g, ''),
+            hash: '',
+            type: consts.tTypes.upload.file.unhashed,
+            status: consts.tStatus.pending
         }
     });
+    
+    tasks.forEach(worker.addTask);
 
-    files.forEach(file => {
-        redis.set(file.key, JSON.stringify(file), err => {
-            queue.push(file, () => {
-                console.log(`Task ${file.key} is ready`);
-            });
-        })
+    res.json({
+        upload: true,
+        tasks
     });
-
-    res.json({ upload: true, files });
 });
 
-// GET /files
-router.get('/files/:id', (req, res) => {
-    redis.get(req.params.id, (err, data) => {
-        res.json(JSON.parse(data));
-    });
+router.get('/tasks/:id', (req, res) => {
+    worker.getTask(req.params.id).then(task => res.json(task));
+});
+
+router.get('/archive', (req, res) => {
+    let task = {
+        targets: req.query.results.split(','),
+        hash: '',
+        type: consts.tTypes.archive.unhashed,
+        status: consts.tStatus.pending
+    };
+    
+    worker.addTask(task);
+
+    res.json({success: true});
 });
 
 module.exports = router;

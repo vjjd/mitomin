@@ -6,7 +6,7 @@ import jQuery from 'jquery';
 import Dropzone from 'react-dropzone';
 import request from'superagent';
 
-let clientFiles = [];
+let clientTasks = [];
 let statusIcons = {
     'done': 'fa fa-check',
     'pending': 'fa fa-hourglass',
@@ -14,15 +14,13 @@ let statusIcons = {
 };
 
 class Step1Dropzone extends React.Component {
-    onDrop(files) {
-        let req = request.post('/api/v1/files');
+    onDrop(tasks) {
+        let req = request.post('/api/v1/tasks');
 
-        files.forEach((file)=> {
-            req.attach(file.name, file);
-        });
+        tasks.forEach(task => req.attach(task.label, task));
 
         req.end((err, res) => {
-            clientFiles = clientFiles.concat(JSON.parse(res.text).files);
+            clientTasks = clientTasks.concat(JSON.parse(res.text).tasks);
         });
     }
 
@@ -45,21 +43,38 @@ class Step1Dropzone extends React.Component {
 class Step2List extends React.Component {
     constructor() {
         super();
-        this.state = { files: clientFiles }
+        this.state = { tasks: clientTasks }
     }
 
     componentWillMount() {
-        setInterval(() => this._fetchFiles(), 5000);
+        setInterval(() => this._fetchTasks(), 5000);
     }
 
     render() {
+        // let csvs = 'dummy';
+        // let pdfs = 'dummy';
+        
+        let csvs = this.state.tasks.map((task) => {
+            if (task.status == 'done') return (
+                <a href={`/results/${task.hash}/${task.bodyName}.csv`} download=''><i className="fa fa-file-text-o" /></a>
+            );
+            else return "";
+        });
+
+        let pdfs = this.state.tasks.map((task) => {
+            if (task.status == 'done') return (
+                <a href={`/results/${task.hash}/${task.bodyName}.pdf`} download=''><i className="fa fa-file-pdf-o" /></a>
+            );
+            else return "";
+        });
+
         return (
             <table class="table-responsive">
                 <tbody>
-                {this.state.files.map((f, i) => (
+                {this.state.tasks.map((task, i) => (
                     <tr key={i}>
-                        <td>{f.name}</td>
-                        <td><i className={statusIcons[f.status]} /></td>
+                        <td>{task.label}</td>
+                        <td><i className={statusIcons[task.status]} /> {csvs[i]} {pdfs[i]}</td>
                     </tr>
                 ))}
                 </tbody>
@@ -67,20 +82,20 @@ class Step2List extends React.Component {
         );
     }
 
-    _fetchFiles() {
-        clientFiles.forEach((file, i) => {
-            if (file.status == 'pending') {
+    _fetchTasks() {
+        clientTasks.forEach((task, i) => {
+            if (task.status == 'pending') {
                 jQuery.ajax({
                     method: 'GET',
-                    url: `/api/v1/files/${file.key}`,
+                    url: `/api/v1/tasks/${task.id}`,
                     success: response => {
-                        clientFiles[i].status = response.status;
+                        clientTasks[i] = response;
                     }
                 })
             }
         });
 
-        this.setState({ files: clientFiles });
+        this.setState({ tasks: clientTasks });
     }
 }
 
@@ -92,6 +107,6 @@ jQuery(() => {
 
     ReactDOM.render(
         <Step2List />,
-        document.getElementById('files')
+        document.getElementById('tasks')
     );
 });

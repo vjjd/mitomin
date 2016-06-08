@@ -9,6 +9,8 @@ if (config.redis.auth) {
     client.auth(config.redis.auth);
 }
 
-client.on('error', err => { throw err });
+client.on('error', err => {
+    throw err 
+});
 
 module.exports = client;

@@ -1,15 +1,43 @@
 {
-  "name": "mitomin",
+  "label": "mitomin",
   "version": "0.0.1",
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+      "start": "watchify --debug --extension=js -o public/js/bundle.js src/app.js & node server.js"
+    },
+    "browserify": {
+      "transform": [
+        [
+          "babelify",
+          {
+            "presets": [
+              "es2015",
+              "react"
+            ]
+          }
+        ]
+      ]
   },
   "author": "Stanislav Dryomov",
   "license": "ISC",
+  "devDependencies": {
+    "babel": "6.5.2",
+    "babel-core": "6.8.0",
+    "babel-preset-es2015": "6.6.0",
+    "babel-preset-react": "6.5.0",
+    "babelify": "7.3.0",
+    "browserify": "13.0.1",
+    "gulp": "3.9.1",
+    "supertest": "1.2.0",
+    "watchify": "3.7.0",
+    "vinyl-source-stream": "1.1.0"
+  },
   "dependencies": {
     "async": "2.0.0-rc.4",
+    "chai": "3.5.0",
+    "cookie-parser": "1.4.1",
     "express": "4.13.4",
     "hiredis": "0.4.1",
     "jquery": "2.2.3",
@@ -21,15 +49,13 @@
     "react-dropzone": "3.4.0",
     "redis": "2.6.0-2",
     "split": "1.0.0",
-    "superagent": "1.8.3"
-  },
-  "devDependencies": {
-    "babel-core": "6.8.0",
-    "babel-preset-es2015": "6.6.0",
-    "babel-preset-react": "6.5.0",
-    "babelify": "7.3.0",
-    "browserify": "13.0.1",
-    "gulp": "3.9.1",
-    "vinyl-source-stream": "1.1.0"
+    "superagent": "1.8.3",
+    "winston": "2.2.0",
+    "winston-redis": "1.0.0",
+    "lodash": "4.13.1",
+    "react-redux": "4.4.5",
+    "redux": "3.5.2",
+    "redux-logger": "2.6.1",
+    "redux-thunk": "2.1.0"
   }
 }
